@@ -1,0 +1,44 @@
+# Node modules
+node_modules/
+
+# Archivos de log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variables de entorno
+.env
+.env.*.local
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Carpetas de caché
+.cache/
+.tmp/
+temp/
+
+# Cobertura de tests
+coverage/
+
+# PM2 runtime files
+pids/
+*.pid
+*.seed
+
+# Archivos de lock si usas un gestor diferente
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# VSCode settings
+.vscode/
+
+# Docker
+docker-compose.override.yml
