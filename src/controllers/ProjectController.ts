@@ -60,7 +60,7 @@ export class ProjectController {
     static async deleteProjectById(req: Request, res: Response) {
         const { id } = req.params;
         try {
-            const project = await Project.findByIdAndDelete(id);
+            const project = await Project.findById(id);
             if (!project) {
                 return res.status(404).send("Proyecto no encontrado");
             }
