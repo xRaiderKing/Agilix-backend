@@ -57,13 +57,17 @@ export class ProjectController {
     }
 
 // Eliminar un proyecto por ID
-    static async deleteProjectById(req: Request, res: Response) {
+    static deleteProjectById = async (req: Request, res: Response) => {
         const { id } = req.params;
         try {
             const project = await Project.findById(id);
+
             if (!project) {
-                return res.status(404).send("Proyecto no encontrado");
+                const error = new Error("Proyecto no encontrado");
+                return res.status(404).json({error: error.message});
             }
+            
+            await project.deleteOne();
             res.send("Proyecto eliminado correctamente");
         } catch (error) {
             console.log(error);
