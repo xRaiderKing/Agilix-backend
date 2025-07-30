@@ -63,7 +63,7 @@ export class TaskController {
             await Promise.allSettled([req.task.deleteOne(), req.project.save()]);
             
 
-            res.status(200).json({ message: "Tarea eliminada exitosamente" });
+            res.send("Tarea eliminada exitosamente");
         } catch (error) {
             console.error("Error al obtener la tarea por ID:", error);
             res.status(500).json({ Error: "Error al obtener la tarea por ID" });
