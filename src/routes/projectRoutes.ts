@@ -8,11 +8,11 @@ import { taskBelongToProject, TaskExists } from '../middleware/task'
 import { authenticate } from '../middleware/auth'
 
 const router = Router()
-
+// Proteger todos los endpoints 
+router.use(authenticate)
 // Crear proyectos
 router.post('/', 
     // Validaciones
-    authenticate,
     body('projectName').notEmpty().withMessage('El nombre del proyecto es obligatorio'),
     body('clientName').notEmpty().withMessage('El nombre del cliente es obligatorio'),
     body('description').notEmpty().withMessage('La descripción es obligatoria'), 
@@ -22,7 +22,9 @@ router.post('/',
 )
 
 // Traer todos los proyectos
-router.get('/', ProjectController.getAllProjects)
+router.get('/',
+    // Controlador
+    ProjectController.getAllProjects)
 
 // Traer un proyecto por ID
 router.get('/:id', 
