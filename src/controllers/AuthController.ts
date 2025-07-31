@@ -234,4 +234,10 @@ export class AuthController {
         }
     }
 
+    // Autenticación redirección
+    static user = async (req: Request, res: Response) => {
+        return res.json(req.user)
+    }
+
+
 }
