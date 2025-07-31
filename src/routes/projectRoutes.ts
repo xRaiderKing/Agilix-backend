@@ -5,14 +5,18 @@ import { handleInputsErrors } from '../middleware/validations'
 import { TaskController } from '../controllers/TaskController'
 import { ProjectExists } from '../middleware/project'
 import { taskBelongToProject, TaskExists } from '../middleware/task'
+import { authenticate } from '../middleware/auth'
 
 const router = Router()
 
+// Crear proyectos
 router.post('/', 
     // Validaciones
+    authenticate,
     body('projectName').notEmpty().withMessage('El nombre del proyecto es obligatorio'),
     body('clientName').notEmpty().withMessage('El nombre del cliente es obligatorio'),
-    body('description').notEmpty().withMessage('La descripción es obligatoria'), handleInputsErrors,
+    body('description').notEmpty().withMessage('La descripción es obligatoria'), 
+    handleInputsErrors,
     // Controlador
     ProjectController.createProject
 )
