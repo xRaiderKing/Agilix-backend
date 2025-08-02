@@ -4,7 +4,7 @@ import { ProjectController } from '../controllers/ProjectController'
 import { handleInputsErrors } from '../middleware/validations'
 import { TaskController } from '../controllers/TaskController'
 import { ProjectExists } from '../middleware/project'
-import { taskBelongToProject, TaskExists } from '../middleware/task'
+import { hasAuthorization, taskBelongToProject, TaskExists } from '../middleware/task'
 import { authenticate } from '../middleware/auth'
 import { TeamMemberController } from '../controllers/TeamController'
 
@@ -60,6 +60,7 @@ router.param('projectId', ProjectExists)
 
 // Crear una nueva tarea
 router.post('/:projectId/tasks',
+    hasAuthorization,
      //Validaciones
      body('name').notEmpty().withMessage('El nombre de la tarea es obligatorio'),
      body('description').notEmpty().withMessage('La descripción de la tarea es obligatoria'), 
@@ -91,6 +92,7 @@ router.get('/:projectId/tasks/:taskId',
 // Actualizar una tarea por ID
 router.put('/:projectId/tasks/:taskId',
     // Validaciones
+    hasAuthorization,
     param('taskId').isMongoId().withMessage('ID inválido'),
     body('name').notEmpty().withMessage('El nombre de la tarea es obligatorio'),
     body('description').notEmpty().withMessage('La descripción de la tarea es obligatoria'),
@@ -102,6 +104,7 @@ router.put('/:projectId/tasks/:taskId',
 // Eliminar una tarea por ID
 router.delete('/:projectId/tasks/:taskId',
     // Validaciones
+    hasAuthorization,
     param('taskId').isMongoId().withMessage('ID inválido'),
     handleInputsErrors,
     // Controlador
