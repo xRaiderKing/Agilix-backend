@@ -19,6 +19,7 @@ export interface ITask extends Document {
         user: Types.ObjectId,
         status: TaskStatus
     }[]
+    notes: Types.ObjectId[]
 
 }
 
@@ -42,18 +43,26 @@ export const TaskSchema: Schema = new Schema({
         enum: Object.values(taskStatus),
         default: taskStatus.PENDING
     },
-    completedBy: [{
-        user:{
-            type: Types.ObjectId,
-            ref: 'User',
-            default: null
-        },
-        status: {
-            type: String,
-            enum: Object.values(taskStatus),
-            default: taskStatus.PENDING
+    completedBy: [
+        {
+            user: {
+                type: Types.ObjectId,
+                ref: 'User',
+                default: null
+            },
+            status: {
+                type: String,
+                enum: Object.values(taskStatus),
+                default: taskStatus.PENDING
+            }
         }
-    }]
+    ],
+    notes:[
+        {
+            type: Types.ObjectId,
+            ref: 'Note'
+        }
+    ]
 }, { timestamps: true })
 
 const Task = mongoose.model<ITask>("Task", TaskSchema)
