@@ -16,7 +16,7 @@ export class AuthController {
 
             const { password, email } = req.body
             // Prevenir duplicados
-            const userExists = await User.findOne({email})
+            const userExists = await User.findOne({ email })
             if (userExists) {
                 const error = new Error("Este correo electronico, ya ha sido registrado.")
                 return res.status(409).json({ error: error.message })
@@ -105,12 +105,12 @@ export class AuthController {
 
             // Revisar si la contraseña es correcta
             const isPasswordCorrect = await checkPassword(password, user.password)
-            if(!isPasswordCorrect){
+            if (!isPasswordCorrect) {
                 const error = new Error("Password Incorrecto")
                 return res.status(401).json({ error: error.message })
             }
 
-            const token = generateJWT({id:user._id})
+            const token = generateJWT({ id: user._id })
             res.send(token)
 
 
@@ -126,13 +126,13 @@ export class AuthController {
 
             const { email } = req.body
             // Usuario Exsite
-            const user = await User.findOne({email})
+            const user = await User.findOne({ email })
             if (!user) {
                 const error = new Error("El Usuario no esta registrado")
                 return res.status(404).json({ error: error.message })
             }
 
-            if(user.confirmed){
+            if (user.confirmed) {
                 const error = new Error("El Usuario ha confirmado su cuenta")
                 return res.status(409).json({ error: error.message })
             }
@@ -162,7 +162,7 @@ export class AuthController {
 
             const { email } = req.body
             // Usuario Exsite
-            const user = await User.findOne({email})
+            const user = await User.findOne({ email })
             if (!user) {
                 const error = new Error("El Usuario no esta registrado")
                 return res.status(404).json({ error: error.message })
@@ -198,7 +198,7 @@ export class AuthController {
                 return res.status(404).json({ error: error.message })
             }
 
-            
+
             res.send('Token Valido, Define tu nueva contraseña')
 
         }
@@ -225,7 +225,7 @@ export class AuthController {
 
             await Promise.allSettled([user.save(), tokenExists.deleteOne()])
 
-            
+
             res.send('La contraseña se modificó correctamente')
 
         }
@@ -237,6 +237,52 @@ export class AuthController {
     // Autenticación redirección
     static user = async (req: Request, res: Response) => {
         return res.json(req.user)
+    }
+
+    // Actualizar información del perfil
+    static updateProfile = async (req: Request, res: Response) => {
+        const { name, email } = req.body
+        const userExists = await User.findOne({ email })
+        if (userExists && userExists.id.toString() !== req.user.id.toString()) {
+            const error = new Error('Ese correo ya esta registrado')
+            return res.status(409).json({ error: error.message })
+        }
+        req.user.name = name
+        req.user.email = email
+        try {
+            await req.user.save()
+            res.send('Perfil actualizado correctamente')
+
+        } catch (error) {
+            res.status(500).send('Hubo un error')
+
+        }
+    }
+
+    // Actualizar contraseña desde Profile
+    static updateCurrentUserPassword = async (req: Request, res: Response) => {
+        const { current_password, password } = req.body
+
+        const user = await User.findById(req.user.id)
+
+        const isPasswordCorrect = await checkPassword(current_password, user.password)
+        if (!isPasswordCorrect) {
+            const error = new Error('El password actual es incorrecto')
+            return res.status(401).json({ error: error.message })
+        }
+
+        try {
+            user.password = await hashPassword(password)
+            await user.save()
+            res.send('La contraseña se modifico correctamente')
+
+        } catch (error) {
+            return res.status(401).send('Hubo un error')
+
+        }
+
+
+
     }
 
 
