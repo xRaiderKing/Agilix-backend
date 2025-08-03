@@ -35,21 +35,27 @@ router.get('/:id',
     // Controlador
     ProjectController.getProjectById)
 
+router.param('projectId', ProjectExists)
+
 // Actualizar un proyecto por ID
-router.put('/:id',
+router.put('/:projectId',
     // Validaciones
-    param('id').isMongoId().withMessage('ID inválido'),
+    param('projectId').isMongoId().withMessage('ID inválido'),
     body('projectName').notEmpty().withMessage('El nombre del proyecto es obligatorio'),
     body('clientName').notEmpty().withMessage('El nombre del cliente es obligatorio'),
-    body('description').notEmpty().withMessage('La descripción es obligatoria'), handleInputsErrors,
+    body('description').notEmpty().withMessage('La descripción es obligatoria'),
+    handleInputsErrors,
+    hasAuthorization,
     // Controlador
     ProjectController.updateProjectById
 )
 
 // Eliminar un proyecto por ID
-router.delete('/:id',
+router.delete('/:projectId',
     // Validaciones
-    param('id').isMongoId().withMessage('ID inválido'), handleInputsErrors,
+    param('projectId').isMongoId().withMessage('ID inválido'),
+    handleInputsErrors,
+    hasAuthorization,
     // Controlador
     ProjectController.deleteProjectById
 )
