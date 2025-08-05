@@ -28,6 +28,11 @@ router.get('/',
     // Controlador
     ProjectController.getAllProjects)
 
+// Dashboard para managers
+router.get('/manager/dashboard',
+    // Controlador
+    ProjectController.getManagerDashboard)
+
 // Traer un proyecto por ID
 router.get('/:id',
     // Validaciones

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import Project from '../models/Project';
+import Task from '../models/Task';
 
 export class ProjectController {
     // Crear un nuevo proyecto
@@ -78,4 +79,103 @@ export class ProjectController {
         }
     }
 
+    // Obtener estadísticas del dashboard para managers
+    static async getManagerDashboard(req: Request, res: Response) {
+        try {
+            // Obtener proyectos donde el usuario es manager
+            const managedProjects = await Project.find({
+                manager: req.user.id
+            }).select('_id');
+
+            if (managedProjects.length === 0) {
+                return res.status(403).json({ error: 'No tienes permisos de manager en ningún proyecto' });
+            }
+
+            const projectIds = managedProjects.map(project => project._id);
+
+            // Obtener estadísticas de tareas
+            const taskStats = await Task.aggregate([
+                {
+                    $match: {
+                        project: { $in: projectIds }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$Status',
+                        count: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            // Organizar las estadísticas
+            const stats = {
+                openStories: 0,
+                closedStories: 0,
+                totalProjects: managedProjects.length
+            };
+
+            taskStats.forEach(stat => {
+                if (stat._id === 'completed') {
+                    stats.closedStories = stat.count;
+                } else {
+                    stats.openStories += stat.count;
+                }
+            });
+
+            // Obtener estadísticas por proyecto
+            const projectStats = await Task.aggregate([
+                {
+                    $match: {
+                        project: { $in: projectIds }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            project: '$project',
+                            status: '$Status'
+                        },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id.project',
+                        stats: {
+                            $push: {
+                                status: '$_id.status',
+                                count: '$count'
+                            }
+                        }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'projects',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'project'
+                    }
+                },
+                {
+                    $unwind: '$project'
+                },
+                {
+                    $project: {
+                        projectName: '$project.projectName',
+                        stats: 1
+                    }
+                }
+            ]);
+
+            res.json({
+                summary: stats,
+                projectBreakdown: projectStats
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send("Error al obtener estadísticas del dashboard");
+        }
+    }
 }
