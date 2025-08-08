@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  IMAGE_NAME: jesusyael/backend-agilix
+  IMAGE_NAME: raiderking/agilix-backend
 
 jobs:
   build:
