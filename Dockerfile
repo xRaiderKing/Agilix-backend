@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build  # tsconfig.json debe compilar a /dist
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine
